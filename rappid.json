@@ -1,0 +1,14 @@
+{
+  "schema": "rapp/1",
+  "rappid": "rappid:@kody-w/rapp-brain:61e7639bb200762a633c91189b2a9499a14fd1fd500752b07aa906b26bca4fa5",
+  "kind": "brain",
+  "name": "rapp-brain",
+  "host": "github.com",
+  "owner": "kody-w",
+  "repo": "rapp-brain",
+  "github": "https://github.com/kody-w/rapp-brain",
+  "brain_protocol": "rapp-brain/0",
+  "chain": "brain/ (DOGG dir form)",
+  "minted_at": "2026-08-25T22:07:35Z",
+  "notes": "The first PUBLIC rapp-brain \u2014 the brain about rapp-brains, self-framed, globally summonable via the DOGG network. Minted once per RAPP spec \u00a76.2."
+}

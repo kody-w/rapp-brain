@@ -32,3 +32,13 @@ before claiming success), offline-capable (`--tick-head` a local spine mirror).
 
 Frame envelope: [rapp/1](https://github.com/kody-w/rapp-1). Network + transports +
 chants: [dogg/0](https://github.com/kody-w/dogg/blob/main/PROTOCOL.md).
+
+## Public brains (the DOGG form)
+
+A brain meant for the world uses the network's storage convention instead of
+`brain.jsonl`: a `brain/` directory (`HEAD.json` + `<seq>.json`, sealed epochs when it
+grows) — the shape every DOGG tool already reads. Host it in a public repo and it is a
+**globally accessible brain**: served free over raw.githubusercontent, registrable on
+the spine's registry, summonable by chant, poolable and trust-ratable like any
+dimension. `brainify.py --dogg` emits this form. This repository is itself the first
+public rapp-brain — verify it, summon it, fork it.

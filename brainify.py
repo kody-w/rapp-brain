@@ -24,13 +24,26 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("root"); ap.add_argument("slug")
     ap.add_argument("--include", help="comma-separated subdirs to limit to")
+    ap.add_argument("--dogg", action="store_true",
+                    help="emit the DOGG dir form (brain/HEAD.json + <seq>.json) instead of "
+                         "brain.jsonl — the shape every network tool (verify, summon, "
+                         "registry, pool) reads natively; use for PUBLIC brains")
     ap.add_argument("--tick-head", help="path to a local ticks/HEAD.json mirror (offline); default fetches the public spine")
     a = ap.parse_args()
     root = pathlib.Path(a.root).expanduser()
     stream = f"brain:@kody-w/{a.slug}"
     chainf = root / "brain.jsonl"
+    doggdir = root / "brain"
+    if a.dogg:
+        doggdir.mkdir(exist_ok=True)
+        if (doggdir / "HEAD.json").exists():
+            n = json.loads((doggdir / "HEAD.json").read_text())["count"]
+            chain_src = [json.loads((doggdir / f"{i}.json").read_text()) for i in range(n)]
+        else:
+            chain_src = []
     tick = json.loads(pathlib.Path(a.tick_head).expanduser().read_text() if a.tick_head else __import__("urllib.request",fromlist=["r"]).urlopen("https://raw.githubusercontent.com/kody-w/dogg/main/ticks/HEAD.json",timeout=10).read().decode())
-    chain = [json.loads(l) for l in chainf.read_text().splitlines()] if chainf.exists() else []
+    chain = (chain_src if a.dogg else
+             ([json.loads(l) for l in chainf.read_text().splitlines()] if chainf.exists() else []))
     head = chain[-1] if chain else None
     latest = {}          # slug -> last recorded sha
     for fr in chain:
@@ -56,15 +69,24 @@ def main():
             ok, step, why = R.verify_frame(f, head=head, stream_id_of_record=stream)
             if not ok:
                 raise ValueError(f"{slug}: {step} {why}")
-            with open(chainf, "a") as fh:
-                fh.write(json.dumps(f) + "\n")
+            if a.dogg:
+                (doggdir / f"{f['seq']}.json").write_text(json.dumps(f, indent=2, ensure_ascii=False) + "\n")
+                (doggdir / "HEAD.json").write_text(json.dumps({"count": f["seq"] + 1,
+                    "stream_id": stream, "head_frame": f["frame_hash"], "updated": utc(),
+                    "sealed_epochs": 0, "epoch_size": 288}, indent=2) + "\n")
+            else:
+                with open(chainf, "a") as fh:
+                    fh.write(json.dumps(f) + "\n")
             head = f
             latest[slug] = h
             minted += 1
     # verify the full chain end-to-end before claiming success
     h2 = None
     total = 0
-    for fr in [json.loads(l) for l in chainf.read_text().splitlines()]:
+    final = ((lambda n: [json.loads((doggdir / f"{i}.json").read_text()) for i in range(n)])(
+                 json.loads((doggdir / "HEAD.json").read_text())["count"]) if a.dogg else
+             [json.loads(l) for l in chainf.read_text().splitlines()])
+    for fr in final:
         ok, s, w = R.verify_frame(fr, head=h2, stream_id_of_record=stream)
         assert ok, (fr.get("seq"), s, w)
         h2 = fr; total += 1
