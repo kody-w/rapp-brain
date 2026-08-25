@@ -1,0 +1,3 @@
+# rapp-brain
+
+> Second brains as verifiable dimensions: brain.page frames (rapp/1) over markdown, tick-anchored to the DOGG spine, assimilable via pool/bundle/chant with gate-on-receipt. Spec: SPEC.md · Reference: brainify.py
