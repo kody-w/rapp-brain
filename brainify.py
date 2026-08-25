@@ -24,6 +24,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("root"); ap.add_argument("slug")
     ap.add_argument("--include", help="comma-separated subdirs to limit to")
+    ap.add_argument("--ext", default="md",
+                    help="comma-separated extensions to frame (default md) — anything "
+                         "can be pushed through a frame: json, txt, py, csv…")
     ap.add_argument("--dogg", action="store_true",
                     help="emit the DOGG dir form (brain/HEAD.json + <seq>.json) instead of "
                          "brain.jsonl — the shape every network tool (verify, summon, "
@@ -51,10 +54,12 @@ def main():
     roots = [root / s.strip() for s in a.include.split(",")] if a.include else [root]
     minted = skipped = 0
     for base in roots:
-        for p in sorted(base.rglob("*.md")):
+        exts = {"." + e.strip().lstrip(".") for e in a.ext.split(",")}
+        for p in sorted(q for e in exts for q in base.rglob("*" + e)):
             if any(seg.startswith(".") for seg in p.relative_to(root).parts):
                 continue
-            slug = str(p.relative_to(root))[:-3]
+            slug = str(p.relative_to(root))
+            slug = slug[:-len(p.suffix)] if p.suffix else slug
             h = hashlib.sha256(p.read_bytes()).hexdigest()
             if latest.get(slug) == h:
                 skipped += 1

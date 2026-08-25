@@ -42,3 +42,21 @@ grows) — the shape every DOGG tool already reads. Host it in a public repo and
 the spine's registry, summonable by chant, poolable and trust-ratable like any
 dimension. `brainify.py --dogg` emits this form. This repository is itself the first
 public rapp-brain — verify it, summon it, fork it.
+
+## Scale & batching (canon)
+
+The grain is the document, never the repository: one `brain.page` frame per file
+version. Chains scale by two shapes, not by faster writers:
+
+1. **Fan-out observe, single-pen mint.** Workers hash slices of a large corpus in
+   parallel (the expensive part); the stream's one writer merges their findings into
+   the chain in a single fast sequential pass. Compute in parallel, mint in order —
+   prev-links demand a sequence and get one.
+2. **Shard into parallel dimensions, merge at read.** A very large or multi-device
+   brain splits into sub-dimensions (a chain per domain, per directory, per machine)
+   that never merge at write time. A **tile** joins them at summon time, and the
+   receiver's gate admits only observations that agree with its view — anything that
+   disagrees stays parallel rather than being forced. "The whole brain" is a read-side
+   assembly; there is no write-side bottleneck to outgrow.
+
+Rule of thumb: scale by adding dimensions, never by making any single writer faster.
